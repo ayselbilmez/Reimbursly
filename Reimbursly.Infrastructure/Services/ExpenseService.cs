@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Reimbursly.Application.DTOs.Expense;
 using Reimbursly.Application.DTOs.RejectionReason;
 using Reimbursly.Application.Interfaces;
 using Reimbursly.Domain.Entities;
 using Reimbursly.Domain.Enums;
+using System.Security.Claims;
 
 namespace Reimbursly.Infrastructure.Services;
 
@@ -12,18 +15,25 @@ public class ExpenseService : IExpenseService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileService _fileService;
     private readonly IMapper _mapper;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ExpenseService(IUnitOfWork unitOfWork, IFileService fileService, IMapper mapper)
+    public ExpenseService(IUnitOfWork unitOfWork, IFileService fileService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
     {
         _unitOfWork = unitOfWork;
         _fileService = fileService;
         _mapper = mapper;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<List<ExpenseViewDto>> GetAllAsync()
     {
         var expenses = await _unitOfWork.Repository<Expense>()
-            .FindAsync(e => e.Status == ExpenseStatus.Pending);
+                                        .FindAsync(e => e.Status == ExpenseStatus.Pending,
+                                                    include: q => q
+                                                        .Include(e => e.Category)
+                                                        .Include(e => e.PaymentMethod)
+                                                        .Include(e => e.Location)
+                                                        .Include(e => e.ApprovedBy));
 
         return _mapper.Map<List<ExpenseViewDto>>(expenses);
     }
@@ -31,14 +41,25 @@ public class ExpenseService : IExpenseService
     public async Task<List<ExpenseViewDto>> GetHistoryAsync(Guid employeeId)
     {
         var expenses = await _unitOfWork.Repository<Expense>()
-            .FindAsync(e => e.EmployeeId == employeeId && e.Status != ExpenseStatus.Pending);
+                                        .FindAsync(e => e.EmployeeId == employeeId && e.Status != ExpenseStatus.Pending,
+                                                     include: q => q
+                                                         .Include(e => e.Category)
+                                                         .Include(e => e.PaymentMethod)
+                                                         .Include(e => e.Location)
+                                                         .Include(e => e.ApprovedBy));
 
         return _mapper.Map<List<ExpenseViewDto>>(expenses);
     }
 
     public async Task<ExpenseViewDto> GetByIdAsync(Guid id)
     {
-        var expense = await _unitOfWork.Repository<Expense>().GetByIdAsync(id);
+        var expense = await _unitOfWork.Repository<Expense>()
+                                        .GetAsync(e => e.Id == id,
+                                            include: q => q
+                                                .Include(e => e.Category)
+                                                .Include(e => e.PaymentMethod)
+                                                .Include(e => e.Location)
+                                                .Include(e => e.ApprovedBy));
         return _mapper.Map<ExpenseViewDto>(expense);
     }
 
@@ -91,6 +112,24 @@ public class ExpenseService : IExpenseService
         if (expense == null) return;
 
         _unitOfWork.Repository<Expense>().Remove(expense);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task ApproveAsync(Guid expenseId)
+    {
+        var expense = await _unitOfWork.Repository<Expense>().GetByIdAsync(expenseId);
+        if (expense == null) return;
+
+        // JWT’den Approver ID’yi al
+        var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null) return;
+
+        var approverId = Guid.Parse(userIdClaim);
+
+        expense.Status = ExpenseStatus.Approved;
+        expense.ApprovedById = approverId;
+
+        _unitOfWork.Repository<Expense>().Update(expense);
         await _unitOfWork.CompleteAsync();
     }
 

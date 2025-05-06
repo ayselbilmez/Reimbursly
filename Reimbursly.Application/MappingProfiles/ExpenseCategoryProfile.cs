@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Reimbursly.Application.DTOs.Expense;
 using Reimbursly.Application.DTOs.ExpenseCategory;
 using Reimbursly.Domain.Entities;
 
@@ -12,5 +13,6 @@ public class ExpenseCategoryProfile : Profile
         CreateMap<CreateExpenseCategoryDto, ExpenseCategory>();
         CreateMap<UpdateExpenseCategoryDto, ExpenseCategory>()
             .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
     }
 }

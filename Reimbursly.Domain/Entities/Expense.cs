@@ -27,7 +27,13 @@ public class Expense
 
     public ExpenseStatus Status { get; set; } = ExpenseStatus.Pending;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+    public Guid? ApprovedById { get; set; }
+    public Employee? ApprovedBy { get; set; }
 
     // Uploaded file path
     public string ReceiptPath { get; set; } // example: "/receipts/abc.jpg"
+
+
+
 }

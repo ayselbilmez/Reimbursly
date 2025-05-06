@@ -11,6 +11,7 @@ public class ExpenseViewDto
     public string Location { get; set; } = default!;
 
     public string Status { get; set; } = default!;
+    public string? ApprovedByName { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public string ReceiptPath { get; set; } = default!;

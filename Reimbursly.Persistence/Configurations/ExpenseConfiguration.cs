@@ -28,6 +28,11 @@ public class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
         builder.Property(e => e.CreatedAt)
                .IsRequired();
 
+        builder.HasOne(e => e.ApprovedBy)
+               .WithMany()
+               .HasForeignKey(e => e.ApprovedById)
+               .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(
             new Expense
             {
@@ -52,8 +57,9 @@ public class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
                 PaymentMethodId = Guid.Parse("88888888-8888-8888-8888-888888888888"), // Kredi Kartı
                 EmployeeId = Guid.Parse("e2222222-2222-2222-2222-222222222222"),
                 Status = ExpenseStatus.Approved,
-                ReceiptPath = "uploads/receipts/receipt2.pdf",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                ApprovedById = Guid.Parse("e1111111-1111-1111-1111-111111111111"),
+                ReceiptPath = "uploads/receipts/receipt2.pdf"
             },
             new Expense
             {

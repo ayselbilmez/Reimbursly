@@ -68,6 +68,14 @@ public class ExpenseController : ControllerBase
         return Ok(ApiResponse<string>.Ok("Expense deleted successfully."));
     }
 
+    [HttpPost("approve")]
+    [Authorize(Roles = "Manager,Director,CEO,Admin")]
+    public async Task<IActionResult> Approve([FromQuery] Guid expenseId)
+    {
+        await _service.ApproveAsync(expenseId);
+        return Ok(ApiResponse<string>.Ok("Expense approved. Payment simulation completed."));
+    }
+
     [HttpPost("reject")]
     [Authorize(Roles = "Manager,Director,CEO,Admin")]
     public async Task<IActionResult> Reject([FromBody] RejectionReasonViewDto dto)

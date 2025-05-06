@@ -26,9 +26,32 @@ public class Repository<T> : IRepository<T> where T : class
         return await _entities.FindAsync(id);
     }
 
-    public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<T?> GetAsync(
+    Expression<Func<T, bool>> predicate,
+    Func<IQueryable<T>, IQueryable<T>>? include = null)
     {
-        return await _entities.Where(predicate).ToListAsync();
+        IQueryable<T> query = _context.Set<T>();
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        return await query.FirstOrDefaultAsync(predicate);
+    }
+
+    public async Task<List<T>> FindAsync(
+        Expression<Func<T, bool>> predicate,
+        Func<IQueryable<T>, IQueryable<T>>? include = null)
+    {
+        IQueryable<T> query = _context.Set<T>();
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        return await query.Where(predicate).ToListAsync();
     }
 
     public IQueryable<T> GetQueryable()

@@ -11,5 +11,6 @@ public interface IExpenseService
     Task CreateAsync(CreateExpenseDto dto);
     Task UpdateAsync(Guid id, UpdateExpenseDto dto); // DTO ortak kullanıldı
     Task DeleteAsync(Guid id);
+    Task ApproveAsync(Guid expenseId);
     Task RejectAsync(RejectionReasonViewDto dto);
 }
