@@ -25,6 +25,9 @@ public class PaymentMethodService : IPaymentMethodService
     public async Task<PaymentMethodViewDto> GetByIdAsync(Guid id)
     {
         var method = await _unitOfWork.Repository<PaymentMethod>().GetByIdAsync(id);
+
+        if (method == null) return null;
+
         return _mapper.Map<PaymentMethodViewDto>(method);
     }
 

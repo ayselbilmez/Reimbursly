@@ -27,6 +27,9 @@ public class RoleService : IRoleService
     public async Task<RoleViewDto> GetByIdAsync(Guid id)
     {
         var role = await _unitOfWork.Repository<Role>().GetByIdAsync(id);
+
+        if (role == null) return null;
+
         return _mapper.Map<RoleViewDto>(role);
     }
 

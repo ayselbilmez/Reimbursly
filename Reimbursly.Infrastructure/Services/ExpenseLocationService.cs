@@ -27,6 +27,10 @@ public class ExpenseLocationService : IExpenseLocationService
     public async Task<ExpenseLocationViewDto> GetByIdAsync(Guid id)
     {
         var location = await _unitOfWork.Repository<ExpenseLocation>().GetByIdAsync(id);
+
+        if (location == null)
+            return null;
+
         return _mapper.Map<ExpenseLocationViewDto>(location);
     }
 

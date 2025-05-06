@@ -120,7 +120,6 @@ public class ExpenseService : IExpenseService
         var expense = await _unitOfWork.Repository<Expense>().GetByIdAsync(expenseId);
         if (expense == null) return;
 
-        // JWT’den Approver ID’yi al
         var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userIdClaim == null) return;
 

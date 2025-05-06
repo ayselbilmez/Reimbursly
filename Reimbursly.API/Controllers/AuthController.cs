@@ -17,11 +17,6 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    /// <summary>
-    /// Kullanıcı giriş işlemi yapar ve JWT token döner.
-    /// </summary>
-    /// <param name="loginRequest">Email ve şifre bilgileri</param>
-    /// <returns>JWT Token + kullanıcı bilgileri</returns>
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)

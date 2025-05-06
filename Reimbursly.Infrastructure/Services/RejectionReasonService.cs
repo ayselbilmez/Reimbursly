@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Reimbursly.Application.DTOs.RejectionReason;
 using Reimbursly.Application.Interfaces;
 using Reimbursly.Domain.Entities;
@@ -19,21 +20,34 @@ public class RejectionReasonService : IRejectionReasonService
 
     public async Task<List<RejectionReasonViewDto>> GetAllAsync()
     {
-        var rejections = await _unitOfWork.Repository<RejectionReason>().GetAllAsync();
-        return _mapper.Map<List<RejectionReasonViewDto>>(rejections);
+        var list = await _unitOfWork.Repository<RejectionReason>()
+                                    .FindAsync(r => true, include: q => q.Include(r => r.Approver));
+
+        if (list == null)
+            return null;
+
+        return _mapper.Map<List<RejectionReasonViewDto>>(list);
     }
 
     public async Task<List<RejectionReasonViewDto>> GetByExpenseIdAsync(Guid expenseId)
     {
-        var rejections = await _unitOfWork.Repository<RejectionReason>()
-            .FindAsync(r => r.ExpenseId == expenseId);
+        var list = await _unitOfWork.Repository<RejectionReason>()
+                                    .FindAsync(r => r.ExpenseId == expenseId, include: q => q.Include(r => r.Approver));
 
-        return _mapper.Map<List<RejectionReasonViewDto>>(rejections);
+        if (list == null)
+            return null;
+
+        return _mapper.Map<List<RejectionReasonViewDto>>(list);
     }
 
     public async Task<RejectionReasonViewDto> GetByIdAsync(Guid id)
     {
-        var rejection = await _unitOfWork.Repository<RejectionReason>().GetByIdAsync(id);
+        var rejection = await _unitOfWork.Repository<RejectionReason>()
+                                         .GetAsync(r => r.Id == id, include: q => q.Include(r => r.Approver));
+
+        if (rejection == null)
+            return null;
+
         return _mapper.Map<RejectionReasonViewDto>(rejection);
     }
 

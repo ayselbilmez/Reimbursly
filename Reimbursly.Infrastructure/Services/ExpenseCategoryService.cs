@@ -25,6 +25,10 @@ public class ExpenseCategoryService : IExpenseCategoryService
     public async Task<ExpenseCategoryViewDto> GetByIdAsync(Guid id)
     {
         var category = await _unitOfWork.Repository<ExpenseCategory>().GetByIdAsync(id);
+        
+        if (category == null)
+            return null;
+       
         return _mapper.Map<ExpenseCategoryViewDto>(category);
     }
 
