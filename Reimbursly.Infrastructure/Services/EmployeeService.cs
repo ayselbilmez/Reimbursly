@@ -32,13 +32,12 @@ public class EmployeeService : IEmployeeService
 
     public async Task CreateAsync(CreateEmployeeDto dto)
     {
-        // Otomatik olarak en düşük seviye rolü ata (örneğin: "Uzman Yardımcısı")
         var defaultRole = await _unitOfWork.Repository<Role>()
-            .FindAsync(r => r.Name == "Uzman Yardımcısı");
+            .FindAsync(r => r.Name == "Assistant Specialist");
 
         var role = defaultRole.FirstOrDefault();
         if (role == null)
-            throw new Exception("Varsayılan rol 'Uzman Yardımcısı' bulunamadı.");
+            throw new Exception("Default role Assistant Specialist is not found.");
 
         var employee = _mapper.Map<Employee>(dto);
         employee.Id = Guid.NewGuid();
