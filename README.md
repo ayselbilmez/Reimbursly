@@ -27,12 +27,12 @@ Reimbursly, çalışan masraflarını dijital olarak yönetmenizi sağlayan, rol
 
 ## 📁 Project Structure
 
-Reimbursly.API → API katmanı (controllers & startup)
-Reimbursly.Application → DTOs, Interfaces, Validation
-Reimbursly.Domain → Entities, Enums
-Reimbursly.Infrastructure → Services, AutoMapper, Auth, FileService
-Reimbursly.Persistence → DbContext, Configurations, Seed Data
-Reimbursly.Shared → Ortak helper yapılar (ApiResponse, Extensions)
+Reimbursly.API → API katmanı (controllers & startup)  
+Reimbursly.Application → DTOs, Interfaces, Validation  
+Reimbursly.Domain → Entities, Enums  
+Reimbursly.Infrastructure → Services, AutoMapper, Auth, FileService  
+Reimbursly.Persistence → DbContext, Configurations, Seed Data  
+Reimbursly.Shared → Ortak helper yapılar (ApiResponse, Extensions)  
 
 
 ## 🧪 Swagger Test
